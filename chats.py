@@ -9,6 +9,8 @@ from xml.parsers.expat import ExpatError
 from datetime import datetime
 from dateutil import parser as date_parser
 from matplotlib import pyplot
+import matplotlib.ticker as ticker
+import numpy as np
 
 class GChatLogs(object):
     """
@@ -191,6 +193,12 @@ def simple_analysis(directory):
 
 
 def plot_chat_volume(chats):
+    """
+    Gives a list of ChatLogs this creates a plot of number of conversations by date.
+
+    :param chats: sequence of ChatLog
+    """
+
     dates = Counter()
     for chat in chats:
         dates[chat.date.date()] += 1
@@ -199,7 +207,14 @@ def plot_chat_volume(chats):
     fig = pyplot.figure()
     plot = fig.add_subplot(111)
     plot.plot([d.toordinal() for d in ordered], [dates[d] for d in ordered])
-#    plot.set_xticklabels(ordered)
+
+    def format_date(x, pos=None):
+        d = datetime.fromordinal(int(x))
+        return d.strftime('%Y-%m-%d')
+
+    plot.xaxis.set_major_formatter(ticker.FuncFormatter(format_date))
+    fig.autofmt_xdate()
+
     pyplot.show()
 
 
